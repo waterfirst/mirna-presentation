@@ -213,24 +213,54 @@ p, li { font-size: 1rem; line-height: 1.8; color: var(--text); }
   letter-spacing: 0.02em;
 }
 
-/* ── SCRIPT ── */
+/* ── SCRIPT (토글) ── */
+.script-toggle {
+  margin: 1.5rem 0;
+}
+.script-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #1A1A2E, #16213E);
+  border: 1px solid #30363D;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  color: var(--accent2);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.script-toggle-btn:hover {
+  background: linear-gradient(135deg, #22224a, #1a2a4e);
+  border-color: var(--accent2);
+}
+.script-toggle-btn .arrow {
+  display: inline-block;
+  transition: transform 0.3s;
+  font-size: 0.7rem;
+}
+.script-toggle.open .arrow {
+  transform: rotate(90deg);
+}
 .script-box {
   background: linear-gradient(135deg, #1A1A2E, #16213E);
   border: 1px solid #30363D;
-  border-radius: 12px;
+  border-radius: 0 12px 12px 12px;
   padding: 1.3rem 1.5rem;
-  margin: 1.5rem 0;
+  margin-top: 0;
   position: relative;
+  display: none;
+  animation: scriptSlide 0.3s ease;
 }
-.script-box::before {
-  content: '🎤 발표 스크립트';
+.script-toggle.open .script-box {
   display: block;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--accent2);
-  margin-bottom: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+}
+@keyframes scriptSlide {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .script-box p {
   font-size: 0.95rem;
@@ -379,7 +409,11 @@ footer {
     </div>
   </div>
 
-  <div class="script-box" style="margin-top:2rem; max-width:800px;">
+  <div class="script-toggle" id="st1">
+    <button class="script-toggle-btn" onclick="toggleScript('st1')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       안녕하세요, 30131번 최태서입니다.<br><br>
       오늘 발표할 주제는 <span class="emphasis">"환경 유해 물질에 의한 miRNA 변동의 열역학적 분석과
@@ -390,6 +424,7 @@ footer {
       그 과정을 화학 시간에 배운 엔탈피랑 깁스 자유에너지로 설명할 수 있고,
       이걸 AI로 분석하면 암을 10년 전에 미리 예측할 수도 있다</span> — 그런 이야기입니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -444,7 +479,11 @@ footer {
     </div>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st2">
+    <button class="script-toggle-btn" onclick="toggleScript('st2')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       이 탐구는 갑자기 나온 아이디어가 아닙니다.
       고등학교 3년 동안 해왔던 활동들이 하나의 지점에서 만난 겁니다.<br><br>
@@ -459,6 +498,7 @@ footer {
       <span class="strong-emphasis">"miRNA를 매개로 한 환경성 질환 조기 진단"</span>이라는
       하나의 주제로 수렴됐어요.
     </p>
+    </div>
   </div>
 </section>
 
@@ -504,7 +544,11 @@ footer {
     효소-기질 결합, 항원-항체 반응과 같은 원리가 miRNA에도 그대로 적용됩니다.</p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st3">
+    <button class="script-toggle-btn" onclick="toggleScript('st3')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       miRNA는 약 <span class="emphasis">20~24개 염기</span>로 된 아주 짧은 RNA예요.
       유전정보를 담고 있지는 않지만,
@@ -518,6 +562,7 @@ footer {
       A-U 쌍은 수소결합 2개, G-C 쌍은 3개.
       G-C가 많을수록 결합 엔탈피가 커지고, 더 안정하게 달라붙습니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -587,7 +632,11 @@ footer {
     </div>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st4">
+    <button class="script-toggle-btn" onclick="toggleScript('st4')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       환경 독소가 miRNA를 바꾸는 과정은 <span class="emphasis">4단계</span>입니다.<br><br>
       1단계 — PM2.5, 카드뮴, BPA가 세포 안으로 들어옵니다.<br>
@@ -599,6 +648,7 @@ footer {
       효소 입체구조가 변형되어 절단 효율이 떨어집니다.<br><br>
       1학년 때 카탈레이스가 pH에 따라 활성이 변했던 것과 <span class="strong-emphasis">정확히 같은 원리</span>입니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -653,7 +703,11 @@ footer {
     이것이 본 탐구가 "단순 농도 입력"이 아닌 "열역학적 변수 입력" AI를 제안하는 근거입니다.</p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st5">
+    <button class="script-toggle-btn" onclick="toggleScript('st5')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       이 슬라이드가 본 탐구의 <span class="strong-emphasis">가장 핵심</span>입니다.<br><br>
       G-C 쌍은 수소결합 3개로 약 <span class="emphasis">−25 kJ/mol</span>,
@@ -668,6 +722,7 @@ footer {
       환경 독소의 영향은 "독성"이 아니라
       ΔH의 감소, ΔS의 변화, Ea의 증가라는 정량적 변수로 분해할 수 있다는 겁니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -699,7 +754,11 @@ footer {
     → 고급생명과학: "종양 미세환경에서의 유전자 발현 패턴 제어"와 정확히 일치합니다.</p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st6">
+    <button class="script-toggle-btn" onclick="toggleScript('st6')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       miRNA가 바뀌면 <span class="emphasis">두 가지 방향</span>의 불균형이 동시에 일어납니다.<br><br>
       첫째, <span class="strong-emphasis">oncomiR(miR-21)이 증가</span>합니다.
@@ -711,6 +770,7 @@ footer {
       이 <span class="strong-emphasis">"이중 불균형"</span> — 브레이크 고장 + 엑셀러레이터 폭주 —
       이 상태가 되면 암의 표현형으로 진행합니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -749,7 +809,11 @@ footer {
     <strong>"논리적 제안(Conceptual Design)"</strong>입니다.</p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st7">
+    <button class="script-toggle-btn" onclick="toggleScript('st7')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       여기서 이런 질문이 나올 겁니다.
       "그거 좋은데, 실제로 측정이 되긴 하는 거야?"<br><br>
@@ -760,6 +824,7 @@ footer {
       여기까지가 "현존하는 과학"이에요.
       다음 슬라이드부터가 제가 이 부품들을 조립한 "논리적 제안"입니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -807,7 +872,11 @@ footer {
     이것이 "데이터 통계"와 "분자 화학적 근거"를 연결하는 본 탐구만의 접근입니다.</p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st8">
+    <button class="script-toggle-btn" onclick="toggleScript('st8')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       제가 제안하는 시스템은 <span class="emphasis">3단계</span>입니다.<br><br>
       1단계 — 독소별 miRNA 변화 패턴을 DB로 만드는 "환경 지문" 구축.<br>
@@ -818,6 +887,7 @@ footer {
       <span class="emphasis">결합 엔탈피 ΔH, 깁스 자유에너지 ΔG, 활성화 에너지 Ea</span>까지
       함께 입력합니다. 이게 "데이터 통계"와 "분자 화학적 근거"를 연결하는 부분이에요.
     </p>
+    </div>
   </div>
 </section>
 
@@ -859,7 +929,11 @@ footer {
     "한계를 아는 것이 곧 학문적 성숙의 시작이다."</p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st9">
+    <button class="script-toggle-btn" onclick="toggleScript('st9')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       어떤 탐구든 한계를 솔직히 말하는 게 중요합니다.<br><br>
       첫째, 사람마다 기저 miRNA 농도가 달라서 <span class="emphasis">Baseline 설정</span>이 어렵습니다.<br>
@@ -869,6 +943,7 @@ footer {
       이 한계들이 약점처럼 보일 수 있지만,
       <span class="strong-emphasis">한계를 인정하는 것 자체가 학문적 엄밀성</span>을 보여준다고 생각합니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -908,7 +983,11 @@ footer {
     <em>— 감사합니다. 질문 받겠습니다.</em></p>
   </div>
 
-  <div class="script-box">
+  <div class="script-toggle" id="st10">
+    <button class="script-toggle-btn" onclick="toggleScript('st10')">
+      <span class="arrow">▶</span> 🎤 발표 스크립트 보기
+    </button>
+    <div class="script-box">
     <p>
       세 가지 결론입니다.<br><br>
       첫째, <span class="emphasis">miRNA는 화학의 언어로 설명 가능</span>합니다.
@@ -923,6 +1002,7 @@ footer {
       저를 환경생명공학자의 꿈으로 이끌었습니다.<br><br>
       감사합니다. 질문 받겠습니다.
     </p>
+    </div>
   </div>
 </section>
 
@@ -1038,6 +1118,20 @@ window.addEventListener('scroll', () => {
     if (a.getAttribute('href') === '#' + current) a.classList.add('active');
   });
 });
+
+// Script toggle
+function toggleScript(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('open');
+    const btn = el.querySelector('.script-toggle-btn');
+    if (el.classList.contains('open')) {
+      btn.innerHTML = '<span class="arrow">▶</span> 🎤 발표 스크립트 접기';
+    } else {
+      btn.innerHTML = '<span class="arrow">▶</span> 🎤 발표 스크립트 보기';
+    }
+  }
+}
 </script>
 </body>
 </html>
