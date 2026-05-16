@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>환경 유해 물질에 의한 miRNA 변동 — 최태서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0D1117;
+  --bg2: #0A1A3A;
+  --card: #161B22;
+  --card2: #1A1A2E;
+  --accent: #58A6FF;
+  --accent2: #F78166;
+  --green: #3FB950;
+  --purple: #A06CD5;
+  --cyan: #56D4DD;
+  --red: #FF6B6B;
+  --text: #E6EDF3;
+  --muted: #8B949E;
+  --font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  background: rgba(13,17,23,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid #21262D;
+  padding: 0.6rem 1.5rem;
+  display: flex; align-items: center; gap: 1.2rem;
+  overflow-x: auto; white-space: nowrap;
+}
+.nav a {
+  color: var(--muted); text-decoration: none;
+  font-size: 0.82rem; font-weight: 500;
+  padding: 0.3rem 0.6rem; border-radius: 6px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.nav a:hover, .nav a.active { color: var(--accent); background: rgba(88,166,255,0.1); }
+.nav .logo { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+
+/* ── SECTION ── */
+section {
+  min-height: 100vh;
+  padding: 5rem 1.5rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.slide-num {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  margin-bottom: 0.8rem;
+}
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+}
+h2 {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+p, li { font-size: 1rem; line-height: 1.8; color: var(--text); }
+.muted { color: var(--muted); }
+.accent { color: var(--accent); }
+.orange { color: var(--accent2); }
+.green { color: var(--green); }
+.purple { color: var(--purple); }
+.cyan { color: var(--cyan); }
+.red { color: var(--red); }
+.bold { font-weight: 700; }
+.highlight {
+  background: linear-gradient(120deg, rgba(88,166,255,0.15), rgba(247,129,102,0.15));
+  padding: 1.2rem 1.5rem;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  margin: 1.2rem 0;
+  font-size: 1rem;
+}
+.highlight.orange-hl {
+  background: linear-gradient(120deg, rgba(247,129,102,0.15), rgba(160,108,213,0.1));
+  border-left-color: var(--accent2);
+}
+.highlight.green-hl {
+  background: linear-gradient(120deg, rgba(63,185,80,0.12), rgba(86,212,221,0.08));
+  border-left-color: var(--green);
+}
+
+/* ── CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin: 1.5rem 0;
+}
+.card {
+  background: var(--card);
+  border: 1px solid #21262D;
+  border-radius: 12px;
+  padding: 1.3rem;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.card h3 { margin-bottom: 0.6rem; }
+.card p { font-size: 0.92rem; color: var(--muted); line-height: 1.7; }
+.card-tag {
+  display: inline-block;
+  font-size: 0.72rem; font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 2rem; margin: 1.5rem 0; }
+.timeline::before {
+  content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(var(--green), var(--accent), var(--purple), var(--accent2));
+}
+.tl-item {
+  position: relative; margin-bottom: 1.5rem; padding-left: 1rem;
+}
+.tl-item::before {
+  content: ''; position: absolute; left: -1.7rem; top: 0.4rem;
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--accent); background: var(--bg);
+}
+.tl-item:nth-child(1)::before { border-color: var(--green); }
+.tl-item:nth-child(2)::before { border-color: var(--accent); }
+.tl-item:nth-child(3)::before { border-color: var(--purple); }
+.tl-item:nth-child(4)::before { border-color: var(--accent2); }
+.tl-year {
+  font-weight: 700; font-size: 0.85rem;
+  padding: 0.15rem 0.6rem; border-radius: 4px;
+  display: inline-block; margin-bottom: 0.3rem;
+}
+
+/* ── STEPS ── */
+.steps { counter-reset: step; margin: 1.5rem 0; }
+.step {
+  counter-increment: step;
+  display: flex; gap: 1rem; margin-bottom: 1.2rem;
+  align-items: flex-start;
+}
+.step-num {
+  flex-shrink: 0;
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1rem;
+  color: white;
+}
+.step-body { flex: 1; }
+.step-body h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+.step-body p { font-size: 0.92rem; color: var(--muted); }
+
+/* ── IMAGE ── */
+.slide-img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 1.2rem 0;
+  border: 1px solid #21262D;
+}
+.img-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.2rem 0;
+}
+.img-row img {
+  width: 100%; border-radius: 10px;
+  border: 1px solid #21262D;
+}
+
+/* ── FORMULA ── */
+.formula {
+  background: var(--card2);
+  border: 1px solid #30363D;
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ── SCRIPT ── */
+.script-box {
+  background: linear-gradient(135deg, #1A1A2E, #16213E);
+  border: 1px solid #30363D;
+  border-radius: 12px;
+  padding: 1.3rem 1.5rem;
+  margin: 1.5rem 0;
+  position: relative;
+}
+.script-box::before {
+  content: '🎤 발표 스크립트';
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-bottom: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.script-box p {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: #C9D1D9;
+}
+.script-box .emphasis {
+  color: var(--accent);
+  font-weight: 600;
+}
+.script-box .strong-emphasis {
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+/* ── QA ── */
+.qa-item {
+  background: var(--card);
+  border: 1px solid #21262D;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.qa-q {
+  padding: 1.2rem 1.5rem;
+  background: rgba(88,166,255,0.08);
+  border-bottom: 1px solid #21262D;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+.qa-a {
+  padding: 1.2rem 1.5rem;
+}
+.qa-a p { font-size: 0.95rem; line-height: 1.8; }
+.qa-img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border: 1px solid #21262D;
+}
+
+/* ── COVER ── */
+#cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(135deg, var(--bg2), var(--bg));
+}
+.cover-img {
+  position: absolute;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50%;
+  max-width: 550px;
+  opacity: 0.4;
+  border-radius: 20px;
+  pointer-events: none;
+}
+.cover-content { position: relative; z-index: 2; }
+.cover-sub {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 1.5rem;
+  line-height: 1.7;
+}
+.cover-badge {
+  display: inline-block;
+  background: rgba(88,166,255,0.15);
+  color: var(--accent);
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  border-top: 1px solid #21262D;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  section { padding: 4rem 1rem 2rem; }
+  .img-row { grid-template-columns: 1fr; }
+  .cover-img { display: none; }
+  .card-grid { grid-template-columns: 1fr; }
+  .nav { gap: 0.5rem; }
+  .nav a { font-size: 0.75rem; padding: 0.2rem 0.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="logo">miRNA 탐구</span>
+  <a href="#cover">표지</a>
+  <a href="#s1">동기</a>
+  <a href="#s2">miRNA</a>
+  <a href="#s3">메커니즘</a>
+  <a href="#s4">엔탈피·ΔG</a>
+  <a href="#s5">암 발생</a>
+  <a href="#s6">액체생검</a>
+  <a href="#s7">AI 시스템</a>
+  <a href="#s8">한계점</a>
+  <a href="#s9">결론</a>
+  <a href="#qa">Q&A</a>
+</nav>
+
+<!-- ═══ SLIDE 0: COVER ═══ -->
+<section id="cover">
+  <img src="images/slide1_cover.png" alt="cover" class="cover-img">
+  <div class="cover-content">
+    <div class="slide-num">고급화학 심화탐구 발표</div>
+    <h1>
+      환경 유해 물질에 의한<br>
+      <span class="orange">miRNA 변동의 열역학적 분석과</span><br>
+      <span class="orange">AI 기반 조기 진단 시스템</span>
+    </h1>
+    <p style="color:var(--muted); margin-bottom: 0.5rem;">
+      — 결합 엔탈피, 자유에너지(ΔG), 그리고 분자 인식의 화학으로 —
+    </p>
+    <p style="color:var(--muted); margin-bottom: 1.5rem;">
+      도서 《꿈의 분자 RNA》(김우재, 김영사, 2023) 연계
+    </p>
+    <div>
+      <span class="cover-badge">고급화학</span>
+      <span class="cover-badge">고급생명과학</span>
+      <span class="cover-badge">화학Ⅰ</span>
+      <span class="cover-badge">확률과 통계</span>
+    </div>
+    <div class="cover-sub">
+      <strong style="font-size:1.1rem;">탐구자: 최태서 (30131)</strong>
+    </div>
+  </div>
+
+  <div class="script-box" style="margin-top:2rem; max-width:800px;">
+    <p>
+      안녕하세요, 30131번 최태서입니다.<br><br>
+      오늘 발표할 주제는 <span class="emphasis">"환경 유해 물질에 의한 miRNA 변동의 열역학적 분석과
+      AI 기반 조기 진단 시스템"</span>입니다.<br><br>
+      쉽게 말하면 이겁니다.
+      <span class="strong-emphasis">미세먼지나 중금속 같은 환경 오염 물질이
+      우리 몸속 아주 작은 RNA를 망가뜨리는데,
+      그 과정을 화학 시간에 배운 엔탈피랑 깁스 자유에너지로 설명할 수 있고,
+      이걸 AI로 분석하면 암을 10년 전에 미리 예측할 수도 있다</span> — 그런 이야기입니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 1: 탐구 동기 ═══ -->
+<section id="s1">
+  <div class="slide-num">SLIDE 01</div>
+  <h2>탐구 동기 — 3년간의 관심이 한 지점에서 만나다</h2>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <span class="tl-year" style="background:rgba(63,185,80,0.2); color:var(--green);">1학년</span>
+      <p>커피 항산화 실험 · 카탈레이스 효소 반응 속도 측정<br>
+      → <strong>"pH가 바뀌면 효소가 왜 안 될까?"</strong> — 첫 번째 궁금증</p>
+    </div>
+    <div class="tl-item">
+      <span class="tl-year" style="background:rgba(88,166,255,0.2); color:var(--accent);">2학년</span>
+      <p>화학Ⅰ에서 엔탈피 학습 · 확률과통계에서 PM2.5 정규분포 직접 계산<br>
+      고급생명과학에서 단백질 구조 AI 예측 (RMSD 값 직접 산출)</p>
+    </div>
+    <div class="tl-item">
+      <span class="tl-year" style="background:rgba(160,108,213,0.2); color:var(--purple);">2학년 진로</span>
+      <p>환경호르몬(BPA, TBT)의 분자적 위험성 조사<br>
+      "환경호르몬 바이오센서"를 미래 연구 주제로 설정</p>
+    </div>
+    <div class="tl-item">
+      <span class="tl-year" style="background:rgba(247,129,102,0.2); color:var(--accent2);">3학년</span>
+      <p>《꿈의 분자 RNA》 독서 → <strong>모든 퍼즐 조각이 맞춰짐!</strong><br>
+      miRNA라는 "미세 조절자" 발견 → 화학·환경·AI·통계가 하나로 수렴</p>
+    </div>
+  </div>
+
+  <div class="highlight orange-hl">
+    <h3 class="orange">핵심 탐구 질문</h3>
+    <p>환경 유해 물질(PM2.5, Cd²⁺, BPA)은 어떤 화학적 경로를 거쳐
+    miRNA의 발현과 결합 안정성을 변화시키며,<br>
+    이를 <strong>ΔH·ΔG·Ea</strong> 등 열역학 변수로 정량화하여
+    <strong>AI 기반 조기 진단 시스템</strong>을 논리적으로 설계할 수 있는가?</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="cyan">탐구 범위</h3>
+      <p>• 환경 독소: PM2.5, 카드뮴(Cd²⁺), BPA<br>
+      • 대표 miRNA: miR-21(종양촉진) / let-7(암억제)<br>
+      • 방법: 개념적 설계(Conceptual Design)</p>
+    </div>
+    <div class="card">
+      <h3 class="cyan">탐구 방법</h3>
+      <p>• 도서 《꿈의 분자 RNA》 핵심 개념 재해석<br>
+      • 2024~2025년 최신 리뷰 논문 분석<br>
+      • AI 기반 진단 시스템의 논리적 구조 제시</p>
+    </div>
+  </div>
+
+  <div class="script-box">
+    <p>
+      이 탐구는 갑자기 나온 아이디어가 아닙니다.
+      고등학교 3년 동안 해왔던 활동들이 하나의 지점에서 만난 겁니다.<br><br>
+      <span class="emphasis">1학년</span> 때 카탈레이스 효소가 pH에 따라 확 달라지는 걸 봤어요.
+      "환경이 바뀌면 왜 효소가 안 되지?" — 이게 시작이었습니다.<br><br>
+      <span class="emphasis">2학년</span> 때 화학Ⅰ에서 엔탈피를 배우면서
+      "결합의 세기가 곧 에너지"라는 걸 알았고,
+      확률과 통계에서는 PM2.5 정규분포를 직접 계산했습니다.<br><br>
+      그리고 <span class="strong-emphasis">3학년</span>,
+      《꿈의 분자 RNA》를 읽었는데 — 이 책이 모든 퍼즐을 맞춰줬습니다.
+      흩어져 있던 화학, 환경, AI, 통계가 전부
+      <span class="strong-emphasis">"miRNA를 매개로 한 환경성 질환 조기 진단"</span>이라는
+      하나의 주제로 수렴됐어요.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 2: miRNA 작동 원리 ═══ -->
+<section id="s2">
+  <div class="slide-num">SLIDE 02</div>
+  <h2>miRNA의 작동 원리 — 화학의 눈으로 본 분자 인식</h2>
+
+  <img src="images/slide3_mirna_mechanism.png" alt="miRNA 생합성 경로" class="slide-img">
+
+  <div class="card-grid">
+    <div class="card">
+      <span class="card-tag" style="background:rgba(63,185,80,0.2); color:var(--green);">정의</span>
+      <h3 class="green">miRNA란?</h3>
+      <p>약 20~24개 염기로 된 짧은 비암호화 RNA.<br>
+      유전자 발현을 조절하는 <strong>"미세 스위치"</strong> 역할</p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="background:rgba(88,166,255,0.2); color:var(--accent);">과정</span>
+      <h3 class="accent">작동 메커니즘</h3>
+      <p>DNA → pri-miRNA → pre-miRNA<br>
+      → 성숙 miRNA → RISC 복합체 결합<br>
+      → 표적 mRNA <strong>분해 또는 번역 억제</strong></p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="background:rgba(247,129,102,0.2); color:var(--accent2);">핵심</span>
+      <h3 class="orange">씨드 영역 (Seed Region)</h3>
+      <p>miRNA의 <strong>2~8번 위치</strong> 염기가 표적을 결정.<br>
+      상보적 수소결합으로 결합 특이성 좌우</p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="background:rgba(160,108,213,0.2); color:var(--purple);">화학2 연결</span>
+      <h3 class="purple">수소결합과 결합 엔탈피</h3>
+      <p>A-U 쌍: 수소결합 <strong>2개</strong><br>
+      G-C 쌍: 수소결합 <strong>3개</strong><br>
+      G-C 함량↑ = 결합 엔탈피↑ = 더 안정</p>
+    </div>
+  </div>
+
+  <div class="highlight green-hl">
+    <p><strong>화학2 교과 연결:</strong>
+    "분자 인식" = 입체 구조의 상보성 + 수소결합의 엔탈피.<br>
+    효소-기질 결합, 항원-항체 반응과 같은 원리가 miRNA에도 그대로 적용됩니다.</p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      miRNA는 약 <span class="emphasis">20~24개 염기</span>로 된 아주 짧은 RNA예요.
+      유전정보를 담고 있지는 않지만,
+      유전자 발현을 조절하는 <span class="strong-emphasis">"미세 스위치"</span> 역할을 합니다.<br><br>
+      작동 과정을 보면, DNA에서 만들어진 후 Drosha 효소가 1차 가공,
+      Dicer 효소가 2차 가공을 해서 성숙 miRNA가 됩니다.
+      이 miRNA가 RISC 복합체를 만들고,
+      표적 mRNA에 달라붙어서 분해하거나 번역을 막습니다.<br><br>
+      여기서 <span class="strong-emphasis">화학2 연결</span>이 중요합니다.
+      miRNA가 mRNA에 결합할 때 핵심은 <span class="emphasis">염기 사이의 수소결합</span>이에요.
+      A-U 쌍은 수소결합 2개, G-C 쌍은 3개.
+      G-C가 많을수록 결합 엔탈피가 커지고, 더 안정하게 달라붙습니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 3: 환경 유해 물질 메커니즘 ═══ -->
+<section id="s3">
+  <div class="slide-num">SLIDE 03</div>
+  <h2>환경 유해 물질이 miRNA를 바꾸는 4단계</h2>
+
+  <img src="images/slide4_env_toxins.png" alt="환경 독소 세포 공격" class="slide-img">
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num" style="background:var(--red);">1</div>
+      <div class="step-body">
+        <h3 class="red">Trigger — 환경 독소 유입</h3>
+        <p>PM2.5 미세먼지, 카드뮴 이온(Cd²⁺), BPA 등이 세포막을 투과하여 유입.<br>
+        막 투과, 수용체 결합, 금속 이온의 리간드 교환 반응 등으로 침투합니다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--accent2);">2</div>
+      <div class="step-body">
+        <h3 class="orange">Chemical Action — ROS 과다 생성</h3>
+        <p><strong>산화-환원 반응</strong>으로 활성산소(ROS)가 과다 생성됩니다.<br>
+        미토콘드리아 전자전달계가 교란 → 산화 스트레스 발생.
+        화학Ⅰ에서 배운 산화-환원이 여기서 그대로 적용!</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--purple);">3</div>
+      <div class="step-body">
+        <h3 class="purple">Regulation — 전사인자 활성 변화</h3>
+        <p>NF-κB, p53, NRF2 등 전사인자가 활성화되면서<br>
+        miRNA 유전자의 <strong>전사량 자체</strong>가 변동합니다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--accent);">4</div>
+      <div class="step-body">
+        <h3 class="accent">Processing — 가공 효소 변형 (핵심!)</h3>
+        <p>ROS가 Dicer 효소의 <strong>시스테인 잔기(-SH)</strong>를 산화시킵니다.<br>
+        -SH → <strong>이황화 결합(-S-S-)</strong>으로 변환
+        → 효소 입체구조 변형 → pre-miRNA 절단 효율 저하.<br>
+        1학년 때 카탈레이스가 pH에 따라 변했던 것과 <strong>정확히 같은 원리</strong>!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="red">PM2.5 노출</h3>
+      <p>호흡기·심혈관 조직에서<br>
+      miR-21 ↑, let-7 ↓<br>
+      → 염증·증식 관련 mRNA 재편</p>
+    </div>
+    <div class="card">
+      <h3 class="orange">카드뮴(Cd²⁺) 노출</h3>
+      <p>신장·간 조직에서<br>
+      miR-34a 발현 변화<br>
+      → p53 매개 세포자살 경로 교란</p>
+    </div>
+    <div class="card">
+      <h3 class="purple">BPA 노출</h3>
+      <p>내분비 관련 조직에서<br>
+      Dicer 활성 전반적 저하<br>
+      → 광범위한 miRNA 풀(pool) 변화</p>
+    </div>
+  </div>
+
+  <div class="script-box">
+    <p>
+      환경 독소가 miRNA를 바꾸는 과정은 <span class="emphasis">4단계</span>입니다.<br><br>
+      1단계 — PM2.5, 카드뮴, BPA가 세포 안으로 들어옵니다.<br>
+      2단계 — 세포 안에서 <span class="emphasis">활성산소(ROS)</span>가 과다 생성됩니다.
+      이건 <span class="strong-emphasis">산화-환원 반응</span>이에요.<br>
+      3단계 — 전사인자가 활성화되면서 miRNA 전사량이 바뀝니다.<br>
+      4단계가 핵심인데요, ROS가 Dicer 효소의 시스테인을 산화시켜서
+      <span class="strong-emphasis">이황화 결합(-S-S-)</span>이 만들어지고,
+      효소 입체구조가 변형되어 절단 효율이 떨어집니다.<br><br>
+      1학년 때 카탈레이스가 pH에 따라 활성이 변했던 것과 <span class="strong-emphasis">정확히 같은 원리</span>입니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 4: 결합 엔탈피 & 깁스 자유에너지 ★ ═══ -->
+<section id="s4">
+  <div class="slide-num" style="background:var(--accent2);">SLIDE 04 ★ 핵심</div>
+  <h2>결합 엔탈피(ΔH)와 깁스 자유에너지(ΔG) — 화학2 핵심</h2>
+
+  <img src="images/slide5_thermodynamics.png" alt="열역학 다이어그램" class="slide-img">
+
+  <div class="formula">
+    <span class="accent">ΔG</span> = <span class="green">ΔH</span> − T<span class="purple">ΔS</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3 class="green">결합 엔탈피 ΔH</h3>
+      <p>A-U 쌍: <strong>−15 kJ/mol</strong> (수소결합 2개)<br>
+      G-C 쌍: <strong>−25 kJ/mol</strong> (수소결합 3개)<br><br>
+      씨드 영역 7개 염기 중 G-C 4개, A-U 3개라면<br>
+      <strong>|ΔH| ≈ (4×3 + 3×2) × 20 ≈ 360 kJ/mol</strong><br>
+      매우 강한 결합!</p>
+    </div>
+    <div class="card">
+      <h3 class="purple">엔트로피 ΔS</h3>
+      <p>두 RNA 가닥이 결합하면 자유도가 줄어듦<br>
+      → <strong>ΔS &lt; 0</strong> (엔트로피적으로 불리)<br><br>
+      결합의 자발성은 엔탈피와 엔트로피의 균형으로 결정되며,<br>
+      이 균형이 <strong>깁스 자유에너지 식</strong>에 반영됩니다.</p>
+    </div>
+    <div class="card">
+      <h3 class="accent">깁스 자유에너지 ΔG</h3>
+      <p>체온 310K(37°C)에서<br>
+      miRNA-mRNA 결합의 ΔG가 <strong>음의 값</strong>이면<br>
+      → <strong>자발적으로 결합</strong>이 일어남<br><br>
+      ΔG ≈ −81 kJ/mol → 확실히 자발적!</p>
+    </div>
+    <div class="card">
+      <h3 class="orange">환경 변화의 효과 ★</h3>
+      <p><strong>온도 상승</strong>(발열·염증): TΔS↑ → ΔG 덜 음 → 결합 불안정<br>
+      <strong>pH 변화</strong>: 수소결합 형성 능력 변화 → ΔH 변화<br>
+      <strong>중금속(Cd²⁺)</strong>: RNA 인산기에 결합 → 2차 구조 붕괴<br>
+      <strong>활성화 에너지(Ea)</strong>: 효소 변형 → Ea↑ → 반응속도↓</p>
+    </div>
+  </div>
+
+  <div class="highlight orange-hl">
+    <p><strong>★ 핵심 차별점:</strong>
+    환경 독소의 영향은 막연한 "독성"이 아니라,<br>
+    <strong>ΔH의 감소, ΔS의 변화, Ea의 증가</strong>라는
+    <strong>정량적 열역학·반응속도론 변수</strong>로 분해할 수 있습니다.<br>
+    이것이 본 탐구가 "단순 농도 입력"이 아닌 "열역학적 변수 입력" AI를 제안하는 근거입니다.</p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      이 슬라이드가 본 탐구의 <span class="strong-emphasis">가장 핵심</span>입니다.<br><br>
+      G-C 쌍은 수소결합 3개로 약 <span class="emphasis">−25 kJ/mol</span>,
+      A-U 쌍은 2개로 약 <span class="emphasis">−15 kJ/mol</span>.
+      씨드 영역 7개 염기로 계산하면 총 결합 엔탈피는 약 360 kJ/mol입니다.<br><br>
+      화학2에서 배운 <span class="strong-emphasis">ΔG = ΔH − TΔS</span>.
+      체온 310K에서 ΔG가 음의 값이면 자발적 결합입니다.<br><br>
+      그런데 환경 스트레스가 이걸 바꿉니다.
+      온도가 올라가면 TΔS가 커져서 결합이 불안정해지고,
+      중금속이 RNA 인산기에 붙으면 구조 자체가 무너집니다.<br><br>
+      <span class="strong-emphasis">핵심 메시지:</span>
+      환경 독소의 영향은 "독성"이 아니라
+      ΔH의 감소, ΔS의 변화, Ea의 증가라는 정량적 변수로 분해할 수 있다는 겁니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 5: 암 발생 ═══ -->
+<section id="s5">
+  <div class="slide-num">SLIDE 05</div>
+  <h2>miRNA 변화와 암 발생의 인과 사슬</h2>
+
+  <div class="card-grid">
+    <div class="card" style="border-left: 4px solid var(--red);">
+      <h3 class="red">oncomiR(종양 촉진 miRNA) 증가</h3>
+      <p><strong>miR-21</strong>이 대표적<br>
+      → PTEN, PDCD4 등 암 억제 유전자의 mRNA를 분해<br>
+      → 종양 증식·침윤 촉진<br><br>
+      쉽게 말하면: <strong>"브레이크를 밟는 유전자"를 꺼버리는 것</strong></p>
+    </div>
+    <div class="card" style="border-left: 4px solid var(--purple);">
+      <h3 class="purple">암 억제 miRNA 감소</h3>
+      <p><strong>let-7</strong> 계열이 대표적<br>
+      → RAS, MYC 등 암유전자의 억제가 풀림<br>
+      → 암유전자 폭주<br><br>
+      쉽게 말하면: <strong>"엑셀러레이터를 밟는 유전자"가 폭주</strong></p>
+    </div>
+  </div>
+
+  <div class="highlight orange-hl">
+    <h3 class="orange">이중 불균형 → 암의 표현형(phenotype)</h3>
+    <p>① 증식 신호 폭주 &nbsp; ② 세포자살(apoptosis) 회피 &nbsp; ③ DNA 손상 반응 실패<br>
+    → 고급생명과학: "종양 미세환경에서의 유전자 발현 패턴 제어"와 정확히 일치합니다.</p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      miRNA가 바뀌면 <span class="emphasis">두 가지 방향</span>의 불균형이 동시에 일어납니다.<br><br>
+      첫째, <span class="strong-emphasis">oncomiR(miR-21)이 증가</span>합니다.
+      암 억제 유전자의 mRNA를 분해해버려요.
+      쉽게 말하면 "브레이크를 밟는 유전자"를 꺼버리는 겁니다.<br><br>
+      둘째, <span class="strong-emphasis">암 억제 miRNA(let-7)가 감소</span>합니다.
+      암유전자가 억제 없이 폭주해요.
+      "엑셀러레이터를 밟는 유전자"가 마음대로 달리는 거예요.<br><br>
+      이 <span class="strong-emphasis">"이중 불균형"</span> — 브레이크 고장 + 엑셀러레이터 폭주 —
+      이 상태가 되면 암의 표현형으로 진행합니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 6: 액체 생검 ═══ -->
+<section id="s6">
+  <div class="slide-num">SLIDE 06</div>
+  <h2>액체 생검 기반 miRNA 검출 — 이건 현실의 과학입니다</h2>
+
+  <div class="card-grid">
+    <div class="card" style="border-top: 3px solid var(--green);">
+      <h3 class="green">miRNA 안정성 — 엑소좀 포장</h3>
+      <p>miRNA는 <strong>엑소좀(Exosome)</strong>이라는
+      인지질 이중층 소포에 담겨 보호됩니다.<br>
+      혈액, 소변, 타액에 존재하며<br>
+      RNase로부터 보호 → <strong>체액에서 안정적 검출 가능</strong></p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--accent);">
+      <h3 class="accent">검출 기술 — RT-qPCR & NGS</h3>
+      <p><strong>RT-qPCR:</strong> 역전사 + 실시간 정량 PCR<br>
+      <strong>디지털 PCR:</strong> 단일 분자 수준 정밀 측정<br>
+      <strong>NGS:</strong> 차세대 염기서열 분석<br>
+      → <strong>펨토몰(10⁻¹⁵ mol)</strong> 수준 검출 가능</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--accent2);">
+      <h3 class="orange">검증된 상관관계</h3>
+      <p>• PM2.5 노출 ↔ 혈중 miR-21 양의 상관관계<br>
+      • 흡연 ↔ let-7 감소 상관관계<br>
+      • 확률과통계에서 직접 PM2.5 정규분포 분석한 경험과 연결<br>
+      → <strong>통계적 연결 가능</strong></p>
+    </div>
+  </div>
+
+  <div class="highlight green-hl">
+    <p>여기까지가 <strong>"현존하는 과학(Real-world Science)"</strong>입니다.<br>
+    다음 슬라이드부터는 이 검증된 부품들을 조립하여 만든
+    <strong>"논리적 제안(Conceptual Design)"</strong>입니다.</p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      여기서 이런 질문이 나올 겁니다.
+      "그거 좋은데, 실제로 측정이 되긴 하는 거야?"<br><br>
+      대답은 <span class="strong-emphasis">"네, 됩니다."</span><br><br>
+      miRNA는 <span class="emphasis">엑소좀</span>에 담겨 혈액, 소변에 돌아다니고,
+      RT-qPCR로 <span class="emphasis">펨토몰 수준</span>까지 검출 가능하며,
+      PM2.5와 miR-21의 상관관계는 이미 <span class="emphasis">논문으로 검증</span>됐습니다.<br><br>
+      여기까지가 "현존하는 과학"이에요.
+      다음 슬라이드부터가 제가 이 부품들을 조립한 "논리적 제안"입니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 7: AI 시스템 ═══ -->
+<section id="s7">
+  <div class="slide-num">SLIDE 07</div>
+  <h2>AI 기반 조기 경보 시스템의 개념적 설계</h2>
+
+  <img src="images/slide8_ai_system.png" alt="AI 진단 시스템" class="slide-img">
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num" style="background:var(--green);">1</div>
+      <div class="step-body">
+        <h3 class="green">환경 지문(Environmental Fingerprinting) 구축</h3>
+        <p>독소별 miRNA 변화 패턴을 데이터베이스화합니다.<br>
+        예: "PM2.5 노출 = miR-21 ↑ + let-7 ↓ + miR-34a ↑"<br>
+        → 독소마다 고유한 <strong>"분자 지문(molecular fingerprint)"</strong>을 만듭니다.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--accent);">2</div>
+      <div class="step-body">
+        <h3 class="accent">AI 기반 패턴 분석</h3>
+        <p><strong>Lasso Regression:</strong> 2,000종 miRNA 중 핵심 20~30개를 자동 선별 (feature selection)<br>
+        <strong>Random Forest:</strong> 비선형 의존 관계를 결정 트리 앙상블로 학습<br>
+        <strong>다변수 회귀:</strong> 여러 miRNA 농도 조합 → "환경 노출량" 역추적</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--accent2);">3</div>
+      <div class="step-body">
+        <h3 class="orange">잠복기 모니터링 — "10년 전 조기 경보"</h3>
+        <p>개인의 baseline miRNA 패턴을 기록해놓고,<br>
+        <strong>Anomaly Detection</strong> 알고리즘으로 통계적 이탈이 감지되면<br>
+        발병 가능성을 <strong>조기에 경고</strong>합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight orange-hl">
+    <p><strong>★ 본 탐구의 차별점:</strong>
+    단순한 "miRNA 농도" 입력이 아니라,<br>
+    <strong>ΔH, ΔG, Ea</strong> 등 <strong>"열역학적 변수"</strong>를 함께 입력합니다.<br>
+    이것이 "데이터 통계"와 "분자 화학적 근거"를 연결하는 본 탐구만의 접근입니다.</p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      제가 제안하는 시스템은 <span class="emphasis">3단계</span>입니다.<br><br>
+      1단계 — 독소별 miRNA 변화 패턴을 DB로 만드는 "환경 지문" 구축.<br>
+      2단계 — Lasso로 핵심 miRNA를 골라내고, Random Forest로 비선형 관계를 학습.<br>
+      3단계 — Anomaly Detection으로 baseline 대비 이탈 감지 → "10년 전 조기 경보".<br><br>
+      <span class="strong-emphasis">차별점:</span>
+      단순히 농도만 넣는 게 아니라
+      <span class="emphasis">결합 엔탈피 ΔH, 깁스 자유에너지 ΔG, 활성화 에너지 Ea</span>까지
+      함께 입력합니다. 이게 "데이터 통계"와 "분자 화학적 근거"를 연결하는 부분이에요.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 8: 한계점 ═══ -->
+<section id="s8">
+  <div class="slide-num">SLIDE 08</div>
+  <h2>한계점 및 비판적 고찰 — 한계를 아는 것이 성숙이다</h2>
+
+  <div class="card-grid">
+    <div class="card" style="border-left: 4px solid var(--red);">
+      <h3 class="red">① Baseline 설정의 어려움</h3>
+      <p>개인마다 기저 miRNA 농도가 다릅니다.<br>
+      환경 노출 때문인지 원래 그런 건지 구분하려면<br>
+      <strong>수만 명 규모의 종단적 연구</strong>가 필요합니다.</p>
+    </div>
+    <div class="card" style="border-left: 4px solid var(--accent2);">
+      <h3 class="orange">② 노화 vs 독소 구분</h3>
+      <p>자연스러운 노화 변동과 환경 독소 변동이 겹칩니다.<br>
+      연령, 식습관, 흡연 여부 등<br>
+      <strong>교란 변수(confounding variables)</strong>를 통제해야 합니다.</p>
+    </div>
+    <div class="card" style="border-left: 4px solid var(--purple);">
+      <h3 class="purple">③ 맥락 의존성</h3>
+      <p>같은 miRNA라도 <strong>조직·암종에 따라 역할이 반대</strong>일 수 있습니다.<br>
+      종양 촉진 역할을 하는 곳도, 억제하는 곳도 있어요.<br>
+      → <strong>조직 특이적 진단 모델</strong>이 필요합니다.</p>
+    </div>
+    <div class="card" style="border-left: 4px solid var(--cyan);">
+      <h3 class="cyan">④ 철학적 질문: 적응인가, 질병인가?</h3>
+      <p>환경 스트레스에 대한 miRNA 변화가<br>
+      <strong>"질병의 전조"인지 "적응 반응"인지</strong> 어떻게 구분할까요?<br>
+      → 시스템의 <strong>임계값(threshold) 설정</strong>에 본질적 함의</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p>이 한계들을 인정하되,
+    <strong>한계를 솔직히 제시하는 것 자체가 본 탐구의 학문적 엄밀성</strong>을 보여줍니다.<br>
+    "한계를 아는 것이 곧 학문적 성숙의 시작이다."</p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      어떤 탐구든 한계를 솔직히 말하는 게 중요합니다.<br><br>
+      첫째, 사람마다 기저 miRNA 농도가 달라서 <span class="emphasis">Baseline 설정</span>이 어렵습니다.<br>
+      둘째, <span class="emphasis">노화 변동과 독소 변동</span>을 구분하기 어렵습니다.<br>
+      셋째, 같은 miRNA도 조직에 따라 역할이 반대라서 <span class="emphasis">맥락 의존성</span> 문제가 있습니다.<br>
+      넷째, miRNA 변화가 "질병의 전조"인지 "적응 반응"인지라는 <span class="emphasis">철학적 질문</span>도 있어요.<br><br>
+      이 한계들이 약점처럼 보일 수 있지만,
+      <span class="strong-emphasis">한계를 인정하는 것 자체가 학문적 엄밀성</span>을 보여준다고 생각합니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 9: 결론 ═══ -->
+<section id="s9">
+  <div class="slide-num">SLIDE 09</div>
+  <h2>결론 — 3년의 점들이 하나의 선이 되다</h2>
+
+  <img src="images/slide10_conclusion.png" alt="융합의 한가운데" class="slide-img">
+
+  <div class="card-grid">
+    <div class="card" style="border-top: 3px solid var(--green);">
+      <h3 class="green">결론 1</h3>
+      <p><strong>miRNA = 화학의 언어로 설명 가능한 "미세 조절자"</strong><br>
+      수소결합 · 결합 엔탈피 · 깁스 자유에너지 · 분자 인식<br>
+      = 화학2 핵심 개념이 그대로 적용됩니다.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--accent);">
+      <h3 class="accent">결론 2</h3>
+      <p><strong>환경 독소 → miRNA 교란 = ΔH·ΔG·Ea로 분해 가능</strong><br>
+      ROS 생성 → 전사인자 변화 → 가공 효소 산화<br>
+      → miRNA 발현 변화. 전부 정량화할 수 있습니다.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--accent2);">
+      <h3 class="orange">결론 3</h3>
+      <p><strong>AI는 "도구"이며, 학문적 깊이만큼만 강력해진다</strong><br>
+      농도만 넣는 AI vs 열역학 변수까지 넣는 AI<br>
+      → 본질적으로 다른 모델입니다.</p>
+    </div>
+  </div>
+
+  <div class="highlight green-hl" style="font-size:1.05rem;">
+    <p>RNA는 생명과 환경 사이에 위치한 <strong>"완충지대"이자 "센서"</strong>다.<br>
+    환경 독소가 miRNA의 수소결합과 결합 자유에너지를 흔들어
+    유전자 조절망을 붕괴시킨다면,<br>
+    우리는 이를 역으로 이용해 <strong>질병의 조기 신호</strong>로 활용할 수 있을 것이다.<br><br>
+    <em>— 감사합니다. 질문 받겠습니다.</em></p>
+  </div>
+
+  <div class="script-box">
+    <p>
+      세 가지 결론입니다.<br><br>
+      첫째, <span class="emphasis">miRNA는 화학의 언어로 설명 가능</span>합니다.
+      화학2에서 배운 개념이 그대로 적용돼요.<br>
+      둘째, 환경 독소의 영향은
+      <span class="emphasis">ΔH·ΔG·Ea라는 정량적 변수</span>로 분해할 수 있습니다.<br>
+      셋째, <span class="emphasis">AI는 "도구"이며, 학문적 깊이만큼만 강력해집니다.</span><br><br>
+      이 탐구를 하면서 가장 크게 느낀 건,
+      <span class="strong-emphasis">화학, 생명과학, 수학, AI가 하나로 융합되는 시대</span>에
+      우리가 살고 있다는 겁니다.
+      그리고 그 융합의 한가운데에 miRNA가 있다는 사실이
+      저를 환경생명공학자의 꿈으로 이끌었습니다.<br><br>
+      감사합니다. 질문 받겠습니다.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ Q&A ═══ -->
+<section id="qa">
+  <div class="slide-num" style="background:var(--purple);">Q&A</div>
+  <h2>예상 질문 & 답변</h2>
+  <p class="muted" style="margin-bottom:1.5rem;">발표 후 예상되는 질문과 준비된 답변입니다.</p>
+
+  <div class="qa-item">
+    <div class="qa-q">Q1. "실험을 안 했는데 어떻게 탐구라고 할 수 있어요?"</div>
+    <div class="qa-a">
+      <p>좋은 질문입니다. 이 탐구는 <strong>'개념적 설계(Conceptual Design)'</strong> 보고서입니다.<br><br>
+      실험 대신 <strong>문헌 해석, 최신 논문 리뷰, 시스템의 논리 구조 설계</strong>를 수행했습니다.
+      실제 공학에서도 실험 전에 반드시 개념 설계 단계를 거칩니다.
+      비행기를 만들기 전에 설계도를 먼저 그리는 것처럼요.<br><br>
+      한계를 인정하되, <strong>논리적 타당성에 집중</strong>한 탐구입니다.
+      후속 탐구에서 ViennaRNA 시뮬레이션이나 TCGA 데이터 분석으로
+      실제 검증을 진행할 계획입니다.</p>
+      <img src="images/qa1_conceptual_design.png" alt="개념적 설계" class="qa-img">
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Q2. "ΔG를 실제로 계산할 수 있어요?"</div>
+    <div class="qa-a">
+      <p>네, 가능합니다! <strong>ViennaRNA</strong>라는 프로그램이 있어요.<br><br>
+      miRNA-mRNA 결합의 ΔG를 실제로 계산해주는 생물정보학 도구입니다.
+      RNA 서열을 입력하면 2차 구조를 예측하고,
+      결합 자유에너지를 <strong>kJ/mol 단위로 정확히</strong> 산출합니다.<br><br>
+      이번 탐구에서는 <strong>원리와 의미를 이해하는 데 집중</strong>했고,
+      후속 탐구에서 직접 ViennaRNA를 돌려서
+      특정 환경 독소가 ΔG를 얼마나 변화시키는지 정량적으로 예측해볼 예정입니다.</p>
+      <img src="images/qa2_vienna_rna.png" alt="ViennaRNA" class="qa-img">
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Q3. "AI가 정말 암을 예측할 수 있나요?"</div>
+    <div class="qa-a">
+      <p>지금 당장 완벽하게는 어렵습니다. 하지만 <strong>기반 기술은 이미 존재</strong>합니다.<br><br>
+      <strong>TCGA</strong>(The Cancer Genome Atlas)와 <strong>GEO</strong>(Gene Expression Omnibus)라는
+      공개 데이터베이스에 <strong>수만 명의 miRNA 발현 데이터</strong>가 저장되어 있어요.
+      이미 Lasso와 Random Forest로 패턴을 학습하는 연구가 진행 중입니다.<br><br>
+      제 탐구의 차별점은 여기에 <strong>'열역학 변수'를 추가</strong>하자는 제안입니다.
+      단순히 "miR-21이 몇 배 증가했다"가 아니라,
+      "결합 ΔG가 몇 kJ/mol 변했다"를 함께 입력하면
+      AI 모델의 <strong>생물학적 근거가 훨씬 단단</strong>해집니다.</p>
+      <img src="images/qa3_tcga_database.png" alt="TCGA 데이터" class="qa-img">
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Q4. "화학2에서 배운 내용이 구체적으로 어떤 건가요?"</div>
+    <div class="qa-a">
+      <p>이 탐구에 적용된 화학 개념을 정리하면:</p>
+      <p>
+        • <strong>결합 엔탈피(ΔH):</strong> 수소결합의 에너지, A-U vs G-C의 차이<br>
+        • <strong>깁스 자유에너지(ΔG = ΔH − TΔS):</strong> 결합의 자발성 판단 기준<br>
+        • <strong>엔트로피(ΔS):</strong> 두 분자 결합 시 자유도 감소<br>
+        • <strong>활성화 에너지(Ea):</strong> 효소 반응의 에너지 장벽<br>
+        • <strong>아레니우스 식(k = A·exp(−Ea/RT)):</strong> 반응 속도와 온도의 관계<br>
+        • <strong>산화-환원 반응:</strong> ROS 생성, 시스테인 산화
+      </p>
+      <p><br>전부 <strong>화학Ⅰ·Ⅱ에서 배운 개념</strong>이
+      miRNA 분자 수준에서 그대로 작동한다는 걸 보여드린 겁니다.
+      화학이 교과서 안에만 있는 게 아니라
+      <strong>살아 있는 세포 안에서 매 순간 작동</strong>하고 있어요.</p>
+      <img src="images/qa4_chemistry_connection.png" alt="화학 연결" class="qa-img">
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q">Q5. "진로가 환경생명공학자라고 했는데, 구체적으로 뭘 하고 싶어요?"</div>
+    <div class="qa-a">
+      <p>환경 오염 물질이 인체에 미치는 영향을
+      <strong>분자 수준에서 분석</strong>하고,
+      이를 <strong>AI와 바이오센서</strong>로 연결해서
+      조기 진단 시스템을 만드는 연구를 하고 싶습니다.<br><br>
+      구체적으로는:<br>
+      • <strong>환경 독소 → miRNA 변화</strong>의 정량적 관계 규명<br>
+      • <strong>액체 생검 기반 바이오센서</strong> 개발<br>
+      • <strong>AI 모델</strong>로 환경성 질환 조기 경보 시스템 설계<br><br>
+      이번 탐구가 그 <strong>첫 번째 청사진</strong>이에요.
+      대학에서 화학공학이나 바이오공학을 전공하면서
+      이 청사진을 실제 연구로 발전시키고 싶습니다.</p>
+      <img src="images/qa5_career_vision.png" alt="진로 비전" class="qa-img">
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>환경 유해 물질에 의한 miRNA 변동의 열역학적 분석과 AI 기반 조기 진단 시스템</p>
+  <p>탐구자: 최태서 (30131) | 고급화학 심화탐구 | 2026</p>
+  <p style="margin-top:0.5rem;">
+    참고문헌: 김우재(2023) 꿈의 분자 RNA | de Mello et al.(2024) PMC11510440 |
+    Singh et al.(2024) PMC11726331 | Chaiwangyen et al.(2025) PMID:40449053
+  </p>
+</footer>
+
+<!-- NAV HIGHLIGHT SCRIPT -->
+<script>
+const navLinks = document.querySelectorAll('.nav a');
+const sections = document.querySelectorAll('section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
